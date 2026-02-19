@@ -55,7 +55,7 @@ The sample extension is a **Color Selected Buildings** tool:
 
 This mirrors the [official color-buildings tutorial](https://github.com/spacemakerai/color-buildings-tutorial) but implemented in Rust compiled to WebAssembly.
 
-![Sample extension screenshot](screenshot.png)
+![Sample extension screenshot](./examples/sample-extension/screenshot.png)
 
 ## Using the bindings in your own project
 
