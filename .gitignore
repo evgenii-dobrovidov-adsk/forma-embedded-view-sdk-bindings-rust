@@ -1,0 +1,19 @@
+# Rust / Cargo
+/target
+**/*.rs.bk
+*.swp
+
+# wasm-pack build output
+examples/sample-extension/web/pkg/
+
+# SDK source (local reference copy, not part of this repo)
+/.forma-embedded-view-sdk-source/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.iml

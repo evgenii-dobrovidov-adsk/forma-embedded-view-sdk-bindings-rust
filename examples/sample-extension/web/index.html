@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sample Forma Extension (Rust/WASM)</title>
+  <script type="importmap">
+    {
+      "imports": {
+        "forma-embedded-view-sdk": "https://esm.sh/forma-embedded-view-sdk@0.91.0",
+        "forma-embedded-view-sdk/auto": "https://esm.sh/forma-embedded-view-sdk@0.91.0/auto"
+      }
+    }
+  </script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      padding: 16px;
+      color: #1a1a1a;
+      background: #fff;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    h2 { font-size: 16px; margin-bottom: 12px; }
+    .row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    label { font-weight: 500; }
+    input[type="color"] {
+      width: 36px;
+      height: 28px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      cursor: pointer;
+      padding: 0;
+    }
+    .stat { color: #555; margin-bottom: 12px; }
+    button {
+      padding: 6px 14px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      background: #f5f5f5;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    button:hover { background: #e8e8e8; }
+    button:active { background: #ddd; }
+    #status {
+      margin-top: 16px;
+      padding: 8px;
+      border-radius: 4px;
+      background: #f0f4ff;
+      color: #334;
+      font-size: 13px;
+      min-height: 36px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Color Buildings (Rust/WASM)</h2>
+  <div class="stat">Buildings in project: <strong id="building-count">–</strong></div>
+  <div class="row">
+    <label for="color-picker">Color:</label>
+    <input type="color" id="color-picker" value="#00ffcc" />
+  </div>
+  <div class="row">
+    <button id="btn-color">Color selected</button>
+    <button id="btn-reset">Reset</button>
+  </div>
+  <div id="status">Initializing WASM…</div>
+
+  <script type="module">
+    import init from "./pkg/sample_extension.js";
+    init();
+  </script>
+</body>
+</html>
