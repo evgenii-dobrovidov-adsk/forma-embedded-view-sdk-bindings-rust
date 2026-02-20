@@ -78,22 +78,18 @@ First consult `autodesk-forma-embedded-views` to determine the correct SDK APIs 
 
 ### Installing the Bindings Crate
 
-The Rust bindings are distributed as a normal Rust crate named `forma-embedded-view-sdk`. First, try adding it via Cargo:
+The `forma-embedded-view-sdk` crate is **not published on crates.io**. The host environment is expected to provide a `[patch.crates-io]` entry in the workspace `Cargo.toml` that resolves it from the Git repository automatically, so a plain `cargo add forma-embedded-view-sdk` should work.
+
+If that patch is not present, add the dependency directly from the Git repository:
 
 ```bash
-cargo add forma-embedded-view-sdk
-```
-
-If the crate is not available on crates.io (or you need an unreleased version), add it directly from the Git repository:
-
-```bash
-cargo add forma-embedded-view-sdk --git https://github.com/evgenii-dobrovidov-adsk/forma-embedded-view-sdk-bindings-rust.git --crate forma-embedded-view-sdk
+cargo add forma-embedded-view-sdk --git https://github.com/evgenii-dobrovidov-adsk/forma-embedded-view-sdk-bindings-rust/tree/main
 ```
 
 This produces a dependency entry like:
 
 ```toml
-forma-embedded-view-sdk = { git = "https://github.com/evgenii-dobrovidov-adsk/forma-embedded-view-sdk-bindings-rust.git" }
+forma-embedded-view-sdk = { git = "https://github.com/evgenii-dobrovidov-adsk/forma-embedded-view-sdk-bindings-rust", branch = "main" }
 ```
 
 ### Core Concepts
@@ -282,7 +278,7 @@ edition = "2021"
 crate-type = ["cdylib"]
 
 [dependencies]
-forma-embedded-view-sdk = "0.1"  # if unavailable on crates.io, use: { git = "https://github.com/evgenii-dobrovidov-adsk/forma-embedded-view-sdk-bindings-rust.git" }
+forma-embedded-view-sdk = "0.1"  # not on crates.io — requires a workspace [patch.crates-io] entry or a direct git dependency (see "Installing the Bindings Crate")
 wasm-bindgen = "0.2"
 wasm-bindgen-futures = "0.4"
 js-sys = "0.3"
