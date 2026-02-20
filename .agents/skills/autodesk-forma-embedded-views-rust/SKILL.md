@@ -271,7 +271,7 @@ web-sys = { version = "0.3", features = [
 
 #### Step 1: Set up the Cargo project
 
-Create a new crate as `crate-type = ["cdylib"]`. Note: the bindings crate handles all JS interop, so you only need `wasm-bindgen`, `wasm-bindgen-futures`, and `web-sys` for DOM glue:
+Create a new crate as `crate-type = ["cdylib"]`. Note: the bindings crate handles all JS interop and re-exports `spawn_local`, so you only need `wasm-bindgen` and `web-sys` for DOM glue:
 
 ```toml
 [package]
@@ -285,7 +285,6 @@ crate-type = ["cdylib"]
 [dependencies]
 forma-embedded-view-sdk = "0.1"  # requires a workspace [patch.crates-io] or git dependency
 wasm-bindgen = "0.2"
-wasm-bindgen-futures = "0.4"
 web-sys = { version = "0.3", features = ["Document", "Element", "HtmlElement", "Window", "console"] }
 ```
 
@@ -330,11 +329,12 @@ pub async fn reset_render() -> forma_embedded_view_sdk::Result<()> {
 ```rust
 mod extension;
 
+use forma_embedded_view_sdk::spawn_local;
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen(start)]
 pub fn main() {
-    wasm_bindgen_futures::spawn_local(async {
+    spawn_local(async {
         if let Err(e) = init_app().await {
             web_sys::console::error_1(&format!("Init failed: {e}").into());
         }
@@ -451,9 +451,8 @@ Extensions depend on these crates:
 
 | Crate | Purpose |
 |---|---|
-| `forma-embedded-view-sdk` | The bindings crate from this repo (handles all JS interop internally) |
+| `forma-embedded-view-sdk` | The bindings crate from this repo (handles JS interop internally and re-exports `spawn_local`) |
 | `wasm-bindgen` | Rust ↔ JS FFI (needed for `#[wasm_bindgen(start)]` and `Closure`) |
-| `wasm-bindgen-futures` | `spawn_local` for bridging sync DOM callbacks to async |
 | `web-sys` | DOM/Web API bindings for extension UI (enable features as needed) |
 
 **Not needed as direct dependencies** (used internally by the bindings crate): `js-sys`, `serde`, `serde-wasm-bindgen`, `serde_json`.
@@ -590,10 +589,11 @@ async fn upload_buildings(geojson: FeatureCollection) -> forma_embedded_view_sdk
 **DOM event handler bridging async work:**
 
 ```rust
+use forma_embedded_view_sdk::spawn_local;
 use wasm_bindgen::prelude::*;
 
 let handler = Closure::wrap(Box::new(move || {
-    wasm_bindgen_futures::spawn_local(async move {
+    spawn_local(async move {
         // async SDK calls here
     });
 }) as Box<dyn FnMut()>);
@@ -627,7 +627,7 @@ After consulting `autodesk-forma-embedded-views` for the correct SDK logic and A
 
 ### Gotchas and Tips
 
-1. **`spawn_local`** — use `wasm_bindgen_futures::spawn_local(async { ... })` to run async code from synchronous contexts (e.g., DOM event handlers, `#[wasm_bindgen(start)]`). This is unavoidable at the boundary between sync DOM callbacks and async SDK calls.
+1. **`spawn_local`** — use `forma_embedded_view_sdk::spawn_local(async { ... })` (or `use forma_embedded_view_sdk::spawn_local;`) to run async code from synchronous contexts (e.g., DOM event handlers, `#[wasm_bindgen(start)]`) without a direct `wasm-bindgen-futures` dependency. This is unavoidable at the boundary between sync DOM callbacks and async SDK calls.
 2. **`camera().move_to()`** — named `move_to` because `move` is a Rust keyword.
 3. **Subscription lifetime** — `Subscription` auto-unsubscribes on `Drop`. Store it in a long-lived location to keep the subscription active. Call `.unsubscribe()` for explicit cleanup.
 4. **Closure lifetime for DOM events** — use `.forget()` for long-lived DOM event callbacks. This intentionally leaks memory to prevent the closure from being dropped while JS still holds a reference.
