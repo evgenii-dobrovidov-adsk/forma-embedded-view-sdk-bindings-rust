@@ -11,7 +11,6 @@ crate-type = ["cdylib"]
 forma-embedded-view-sdk = { path = "../../crates/forma-embedded-view-sdk" }
 wasm-bindgen = "0.2"
 wasm-bindgen-futures = "0.4"
-js-sys = "0.3"
 web-sys = { version = "0.3", features = [
     "Document",
     "Element",
@@ -24,5 +23,3 @@ web-sys = { version = "0.3", features = [
     "Event",
     "console",
 ] }
-serde = { version = "1", features = ["derive"] }
-serde-wasm-bindgen = "0.6"
