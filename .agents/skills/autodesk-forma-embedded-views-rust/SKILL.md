@@ -76,6 +76,26 @@ First consult `autodesk-forma-embedded-views` to determine the correct SDK APIs 
 
 ## Instructions
 
+### Installing the Bindings Crate
+
+The Rust bindings are distributed as a normal Rust crate named `forma-embedded-view-sdk`. First, try adding it via Cargo:
+
+```bash
+cargo add forma-embedded-view-sdk
+```
+
+If the crate is not available on crates.io (or you need an unreleased version), add it directly from the Git repository:
+
+```bash
+cargo add forma-embedded-view-sdk --git https://github.com/evgenii-dobrovidov-adsk/forma-embedded-view-sdk-bindings-rust.git --crate forma-embedded-view-sdk
+```
+
+This produces a dependency entry like:
+
+```toml
+forma-embedded-view-sdk = { git = "https://github.com/evgenii-dobrovidov-adsk/forma-embedded-view-sdk-bindings-rust.git" }
+```
+
 ### Core Concepts
 
 #### 1. Including the JS SDK from esm.sh
@@ -262,7 +282,7 @@ edition = "2021"
 crate-type = ["cdylib"]
 
 [dependencies]
-forma-embedded-view-sdk = { path = "../../crates/forma-embedded-view-sdk" }
+forma-embedded-view-sdk = "0.1"  # if unavailable on crates.io, use: { git = "https://github.com/evgenii-dobrovidov-adsk/forma-embedded-view-sdk-bindings-rust.git" }
 wasm-bindgen = "0.2"
 wasm-bindgen-futures = "0.4"
 js-sys = "0.3"
