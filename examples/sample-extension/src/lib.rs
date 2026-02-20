@@ -1,5 +1,6 @@
 mod extension;
 
+use forma_embedded_view_sdk::spawn_local;
 use wasm_bindgen::prelude::*;
 use web_sys::window;
 
@@ -42,7 +43,7 @@ async fn init_app() -> Result<(), forma_embedded_view_sdk::SdkError> {
     let color_cb = Closure::wrap(Box::new(move || {
         let paths = paths_for_color.clone();
         let color = get_color();
-        wasm_bindgen_futures::spawn_local(async move {
+        spawn_local(async move {
             set_status("Coloring...");
             match extension::color_selected_buildings(&paths, color).await {
                 Ok(n) => set_status(&format!("Colored {n} building(s).")),
@@ -58,7 +59,7 @@ async fn init_app() -> Result<(), forma_embedded_view_sdk::SdkError> {
     color_cb.forget();
 
     let reset_cb = Closure::wrap(Box::new(move || {
-        wasm_bindgen_futures::spawn_local(async move {
+        spawn_local(async move {
             match extension::reset_render().await {
                 Ok(()) => set_status("Reset complete."),
                 Err(e) => set_status(&format!("Error: {e}")),
@@ -77,7 +78,7 @@ async fn init_app() -> Result<(), forma_embedded_view_sdk::SdkError> {
 
 #[wasm_bindgen(start)]
 pub fn main() {
-    wasm_bindgen_futures::spawn_local(async {
+    spawn_local(async {
         if let Err(e) = init_app().await {
             web_sys::console::error_1(&format!("Extension init failed: {e}").into());
             set_status(&format!("Failed to initialize: {e}"));

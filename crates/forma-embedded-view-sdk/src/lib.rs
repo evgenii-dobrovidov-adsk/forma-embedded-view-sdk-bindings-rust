@@ -27,6 +27,7 @@ mod subscription;
 pub use subscription::{Subscription, VoidSubscription};
 
 pub use error::SdkError;
+pub use wasm_bindgen_futures::spawn_local;
 pub type Result<T> = std::result::Result<T, SdkError>;
 
 use types::*;
