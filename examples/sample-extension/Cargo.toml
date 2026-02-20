@@ -9,8 +9,6 @@ crate-type = ["cdylib"]
 
 [dependencies]
 forma-embedded-view-sdk = { path = "../../crates/forma-embedded-view-sdk" }
-wasm-bindgen = "0.2"
-wasm-bindgen-futures = "0.4"
 web-sys = { version = "0.3", features = [
     "Document",
     "Element",

@@ -1,7 +1,8 @@
 mod extension;
 
 use forma_embedded_view_sdk::spawn_local;
-use wasm_bindgen::prelude::*;
+use web_sys::wasm_bindgen::closure::Closure;
+use web_sys::wasm_bindgen::JsCast;
 use web_sys::window;
 
 fn document() -> web_sys::Document {
@@ -60,6 +61,7 @@ async fn init_app() -> Result<(), forma_embedded_view_sdk::SdkError> {
 
     let reset_cb = Closure::wrap(Box::new(move || {
         spawn_local(async move {
+            set_status("Resetting...");
             match extension::reset_render().await {
                 Ok(()) => set_status("Reset complete."),
                 Err(e) => set_status(&format!("Error: {e}")),
@@ -76,8 +78,8 @@ async fn init_app() -> Result<(), forma_embedded_view_sdk::SdkError> {
     Ok(())
 }
 
-#[wasm_bindgen(start)]
-pub fn main() {
+#[no_mangle]
+pub extern "C" fn sample_extension_main() {
     spawn_local(async {
         if let Err(e) = init_app().await {
             web_sys::console::error_1(&format!("Extension init failed: {e}").into());

@@ -114,8 +114,6 @@ name = "sample-extension"
 version = "0.1.0"
 dependencies = [
  "forma-embedded-view-sdk",
- "wasm-bindgen",
- "wasm-bindgen-futures",
  "web-sys",
 ]
 
