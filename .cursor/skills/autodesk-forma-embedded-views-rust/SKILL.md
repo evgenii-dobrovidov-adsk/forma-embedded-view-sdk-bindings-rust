@@ -78,7 +78,28 @@ First consult `autodesk-forma-embedded-views` to determine the correct SDK APIs 
 
 ### Core Concepts
 
-#### 1. The FORMA Singleton
+#### 1. Including the JS SDK from esm.sh
+
+The Rust/WASM bindings do **not** bundle the JavaScript SDK themselves. The `wasm-bindgen`-generated JS glue code contains bare `import` statements like `import ... from "forma-embedded-view-sdk"` and `import ... from "forma-embedded-view-sdk/auto"`. The browser needs to know where to find these modules, so **every extension's HTML entry point must include an importmap** that maps these specifiers to the esm.sh CDN:
+
+```html
+<script type="importmap">
+  {
+    "imports": {
+      "forma-embedded-view-sdk": "https://esm.sh/forma-embedded-view-sdk@0.91.0",
+      "forma-embedded-view-sdk/auto": "https://esm.sh/forma-embedded-view-sdk@0.91.0/auto"
+    }
+  }
+</script>
+```
+
+This `<script type="importmap">` tag must appear **before** any `<script type="module">` tags in the HTML. Both entries are required — the first maps the base package, and the `/auto` entry maps the auto-initialization subpath that the `FORMA` singleton uses internally. When updating the SDK version, change the version number in **both** URLs simultaneously.
+
+Without this importmap the browser will fail to resolve the bare specifiers and the WASM module will not initialize.
+
+See `examples/sample-extension/web/index.html` for a complete working example.
+
+#### 2. The FORMA Singleton
 
 The primary entry point is the `FORMA` thread-local static, which mirrors `import { Forma } from "forma-embedded-view-sdk/auto"` in JS. Access it via `FORMA.with(|f| ...)`:
 
@@ -97,7 +118,7 @@ let result = wasm_bindgen_futures::JsFuture::from(promise).await.unwrap();
 
 > **Critical pattern:** `FORMA.with()` borrows the SDK for the duration of the closure. You must extract the `js_sys::Promise` (or other return value) *inside* the closure, then `.await` it *outside*. Never `.await` inside `.with()`.
 
-#### 2. Manual SDK Construction
+#### 3. Manual SDK Construction
 
 For cases where auto-initialization isn't desired:
 
@@ -108,7 +129,7 @@ let sdk = EmbeddedViewSdk::new(None); // or Some(&config)
 let region = sdk.get_region();
 ```
 
-#### 3. Async Pattern (Promise → JsFuture)
+#### 4. Async Pattern (Promise → JsFuture)
 
 All SDK methods that return `js_sys::Promise` must be awaited via `JsFuture::from()`:
 
@@ -121,7 +142,7 @@ async fn get_project_location() -> Result<JsValue, JsValue> {
 }
 ```
 
-#### 4. Constructing Request Objects
+#### 5. Constructing Request Objects
 
 Most SDK methods accept `&JsValue` request parameters. Two approaches:
 
@@ -151,7 +172,7 @@ Reflect::set(&req, &"path".into(), &path.into()).unwrap();
 let promise = FORMA.with(|f| f.geometry_api().get_triangles(Some(&req)));
 ```
 
-#### 5. Parsing Response Values
+#### 6. Parsing Response Values
 
 Responses come back as `JsValue`. Cast or deserialize as needed:
 
@@ -169,7 +190,7 @@ for i in 0..arr.length() {
 
 For typed arrays: `result.dyn_into::<js_sys::Float32Array>()`.
 
-#### 6. Event Callbacks and Closures
+#### 7. Event Callbacks and Closures
 
 Subscription/event methods accept `&Closure<dyn FnMut(...)>`. The closure must be leaked with `.forget()` (or stored in a long-lived location) to prevent it from being dropped:
 
@@ -198,7 +219,7 @@ element.add_event_listener_with_callback("click", handler.as_ref().unchecked_ref
 handler.forget();
 ```
 
-#### 7. DOM Manipulation via web-sys
+#### 8. DOM Manipulation via web-sys
 
 Access the DOM through `web_sys`:
 
