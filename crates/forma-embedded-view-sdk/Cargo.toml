@@ -2,7 +2,7 @@
 name = "forma-embedded-view-sdk"
 version = "0.1.0"
 edition = "2021"
-description = "Rust/WASM bindings for the Forma Embedded View SDK (forma-embedded-view-sdk npm package)"
+description = "Rust/WASM bindings for the Forma Site Design Embedded View SDK (forma-embedded-view-sdk npm package)"
 license = "Apache-2.0"
 
 [lib]

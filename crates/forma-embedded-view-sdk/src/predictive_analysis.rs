@@ -20,7 +20,7 @@ pub(crate) mod js {
     }
 }
 
-/// Interact with Forma's predictive models for rapid wind analysis.
+/// Interact with Forma Site Design's predictive models for rapid wind analysis.
 pub struct PredictiveAnalysisApi {
     inner: js::PredictiveAnalysisApi,
 }
@@ -30,13 +30,13 @@ impl PredictiveAnalysisApi {
         Self { inner: raw }
     }
 
-    /// Get the wind parameters (wind rose + surface roughness) used by Forma.
+    /// Get the wind parameters (wind rose + surface roughness) used by Forma Site Design.
     pub async fn get_wind_parameters(&self) -> Result<serde_json::Value> {
         let result = JsFuture::from(self.inner.get_wind_parameters()).await?;
         Ok(serde_wasm_bindgen::from_value(result)?)
     }
 
-    /// Predict wind conditions using Forma's rapid wind model.
+    /// Predict wind conditions using Forma Site Design's rapid wind model.
     pub async fn predict_wind(
         &self,
         request: &PredictWindRequest,

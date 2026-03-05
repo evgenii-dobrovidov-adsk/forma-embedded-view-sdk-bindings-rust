@@ -2,7 +2,7 @@
 name = "sample-extension"
 version = "0.1.0"
 edition = "2021"
-description = "Sample Autodesk Forma extension written in Rust/WASM"
+description = "Sample Autodesk Forma Site Design extension written in Rust/WASM"
 
 [lib]
 crate-type = ["cdylib"]

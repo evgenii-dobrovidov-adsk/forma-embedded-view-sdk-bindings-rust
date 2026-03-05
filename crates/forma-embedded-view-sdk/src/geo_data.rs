@@ -24,7 +24,7 @@ impl GeoDataApi {
         Self { inner: raw }
     }
 
-    /// Upload GeoJSON data to Forma and add it to the library.
+    /// Upload GeoJSON data to Forma Site Design and add it to the library.
     /// Supports 2.5D buildings, roads, and property boundaries.
     pub async fn upload(&self, request: &GeoDataUploadRequest) -> Result<LibraryItem> {
         let js_request = serde_wasm_bindgen::to_value(request)?;

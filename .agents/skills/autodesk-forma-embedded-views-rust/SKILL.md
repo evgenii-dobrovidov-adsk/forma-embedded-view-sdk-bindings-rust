@@ -1,21 +1,21 @@
 ---
 name: autodesk-forma-embedded-views-rust
-description: "Rust/WASM bindings and patterns for building Autodesk Forma embedded-view extensions in Rust compiled to WebAssembly, using idiomatic Rust wrappers over the forma-embedded-view-sdk npm package."
+description: "Rust/WASM bindings and patterns for building Autodesk Forma Site Design embedded-view extensions in Rust compiled to WebAssembly, using idiomatic Rust wrappers over the forma-embedded-view-sdk npm package."
 ---
 
-# Autodesk Forma Embedded Views — Rust / WASM
+# Autodesk Forma Site Design Embedded Views — Rust / WASM
 
 ## Overview
 
-This is a **companion skill** to `autodesk-forma-embedded-views`, which is the **source of truth** for Forma extension logic, SDK concepts, API semantics, and what is possible with the Forma Embedded View SDK. This skill provides additional reference on how to **translate those JS/TS patterns into the Rust programming language** using the idiomatic Rust bindings in this repository.
+This is a **companion skill** to `autodesk-forma-embedded-views`, which is the **source of truth** for Forma Site Design extension logic, SDK concepts, API semantics, and what is possible with the Forma Site Design Embedded View SDK. This skill provides additional reference on how to **translate those JS/TS patterns into the Rust programming language** using the idiomatic Rust bindings in this repository.
 
 Refer to `autodesk-forma-embedded-views` for:
-- What each Forma API does and when to use it
+- What each Forma Site Design API does and when to use it
 - Extension architecture, lifecycle, and capabilities
 - Request/response shapes, parameter meanings, and expected behavior
 
 Refer to **this skill** for:
-- The Rust equivalents of JS/TS SDK calls
+- The Rust equivalents of JS/TS Forma Site Design SDK calls
 - Project setup, build tooling, and HTML importmap configuration for Rust/WASM extensions
 - Concrete Rust types for requests and responses
 - Extension structure patterns (separating SDK logic from DOM glue)
@@ -26,13 +26,13 @@ Refer to **this skill** for:
 
 Use this skill **alongside** `autodesk-forma-embedded-views` when the user wants to:
 
-- Build a new Autodesk Forma extension written in Rust compiled to WASM
-- Add features or fix bugs in an existing Rust/WASM Forma extension that uses this bindings crate
-- Translate JS/TS Forma SDK calls into their Rust equivalents
-- Set up the build pipeline for a Rust/WASM Forma extension (wasm-pack, importmap, HTML entry point)
+- Build a new Autodesk Forma Site Design extension written in Rust compiled to WASM
+- Add features or fix bugs in an existing Rust/WASM Forma Site Design extension that uses this bindings crate
+- Translate JS/TS Forma Site Design SDK calls into their Rust equivalents
+- Set up the build pipeline for a Rust/WASM Forma Site Design extension (wasm-pack, importmap, HTML entry point)
 - Create or modify the `forma-embedded-view-sdk` Rust binding crate itself
 
-First consult `autodesk-forma-embedded-views` to determine the correct SDK APIs and logic for the task, then use this skill to translate that into Rust.
+First consult `autodesk-forma-embedded-views` to determine the correct Forma Site Design SDK APIs and logic for the task, then use this skill to translate that into Rust.
 
 ## Repository Structure
 
@@ -394,7 +394,7 @@ cd web
 python3 -m http.server 8080
 ```
 
-Then configure the Forma extension's embedded view URL to `http://localhost:8080`.
+Then configure the Forma Site Design extension's embedded view URL to `http://localhost:8080`.
 
 ### Available API Modules
 

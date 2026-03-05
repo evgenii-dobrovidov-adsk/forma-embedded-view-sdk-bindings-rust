@@ -17,7 +17,7 @@ pub(crate) mod js {
     }
 }
 
-/// Manage generators registered in Forma.
+/// Manage generators registered in Forma Site Design.
 pub struct GeneratorsApi {
     inner: js::GeneratorsApi,
 }

@@ -2,7 +2,7 @@
 
 Rust/WASM bindings for the [forma-embedded-view-sdk](https://www.npmjs.com/package/forma-embedded-view-sdk) npm package.
 
-These bindings allow Rust applications compiled to WebAssembly to interact with the Forma Embedded View SDK — a JavaScript library for creating custom extensions in Autodesk Forma.
+These bindings allow Rust applications compiled to WebAssembly to interact with the Forma Site Design Embedded View SDK — a JavaScript library for creating custom extensions in Autodesk Forma Site Design.
 
 ## Usage
 

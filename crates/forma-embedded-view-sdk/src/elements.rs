@@ -75,7 +75,7 @@ pub(crate) mod js {
     }
 }
 
-/// Read elements and create buildings in Forma's element systems.
+/// Read elements and create buildings in Forma Site Design's element systems.
 pub struct ElementsApi {
     inner: js::ElementsApi,
 }

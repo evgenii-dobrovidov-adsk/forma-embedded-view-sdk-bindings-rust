@@ -32,7 +32,7 @@ pub(crate) mod js {
     }
 }
 
-/// Read geometry data from Forma (paths by category, footprints, triangles).
+/// Read geometry data from Forma Site Design (paths by category, footprints, triangles).
 pub struct GeometryApi {
     inner: js::GeometryApi,
 }

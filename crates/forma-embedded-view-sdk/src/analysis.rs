@@ -29,7 +29,7 @@ pub(crate) mod js {
     }
 }
 
-/// Interact with Forma's native analysis functionality (sun, noise, wind).
+/// Interact with Forma Site Design's native analysis functionality (sun, noise, wind).
 pub struct AnalysisApi {
     inner: js::AnalysisApi,
 }

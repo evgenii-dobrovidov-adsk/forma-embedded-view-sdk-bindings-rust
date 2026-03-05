@@ -191,7 +191,7 @@ pub(crate) mod js {
     }
 }
 
-/// The main Forma Embedded View SDK entry point.
+/// The main Forma Site Design Embedded View SDK entry point.
 pub struct EmbeddedViewSdk {
     inner: js::EmbeddedViewSdk,
 }
