@@ -2,6 +2,114 @@ use serde::{Deserialize, Serialize};
 
 pub type Vec3 = [f64; 3];
 
+pub(crate) mod vec3_serde {
+    use super::Vec3;
+    use serde::{Deserialize, Deserializer, Serialize, Serializer};
+
+    #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+    struct Vec3Object {
+        x: f64,
+        y: f64,
+        z: f64,
+    }
+
+    #[derive(Debug, Clone, Copy, Deserialize)]
+    #[serde(untagged)]
+    enum Vec3Repr {
+        Array([f64; 3]),
+        Object(Vec3Object),
+    }
+
+    impl From<Vec3Repr> for Vec3 {
+        fn from(value: Vec3Repr) -> Self {
+            match value {
+                Vec3Repr::Array(value) => value,
+                Vec3Repr::Object(value) => [value.x, value.y, value.z],
+            }
+        }
+    }
+
+    impl From<Vec3> for Vec3Object {
+        fn from(value: Vec3) -> Self {
+            Self {
+                x: value[0],
+                y: value[1],
+                z: value[2],
+            }
+        }
+    }
+
+    pub fn deserialize<'de, D>(deserializer: D) -> Result<Vec3, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        Ok(Vec3Repr::deserialize(deserializer)?.into())
+    }
+
+    pub fn serialize<S>(value: &Vec3, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        Vec3Object::from(*value).serialize(serializer)
+    }
+
+    pub fn deserialize_option<'de, D>(deserializer: D) -> Result<Option<Vec3>, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        Ok(Option::<Vec3Repr>::deserialize(deserializer)?.map(Into::into))
+    }
+
+    pub fn serialize_option<S>(value: &Option<Vec3>, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        match value {
+            Some(value) => serialize(value, serializer),
+            None => serializer.serialize_none(),
+        }
+    }
+
+    pub fn deserialize_vec<'de, D>(deserializer: D) -> Result<Vec<Vec3>, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        Ok(Vec::<Vec3Repr>::deserialize(deserializer)?
+            .into_iter()
+            .map(Into::into)
+            .collect())
+    }
+
+    pub fn serialize_vec<S>(value: &Vec<Vec3>, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let value: Vec<Vec3Object> = value.iter().copied().map(Vec3Object::from).collect();
+        value.serialize(serializer)
+    }
+
+    pub fn deserialize_polygons<'de, D>(deserializer: D) -> Result<Vec<Vec<Vec3>>, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        Ok(Vec::<Vec<Vec3Repr>>::deserialize(deserializer)?
+            .into_iter()
+            .map(|polygon| polygon.into_iter().map(Into::into).collect())
+            .collect())
+    }
+
+    pub fn serialize_polygons<S>(value: &Vec<Vec<Vec3>>, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let value: Vec<Vec<Vec3Object>> = value
+            .iter()
+            .map(|polygon| polygon.iter().copied().map(Vec3Object::from).collect())
+            .collect();
+        value.serialize(serializer)
+    }
+}
+
 /// GeoJSON FeatureCollection. Uses `serde_json::Value` for maximum flexibility
 /// with arbitrary GeoJSON properties and geometry types.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -83,7 +191,15 @@ pub struct Project {
 /// Camera state returned by `camera.get_current()`.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CameraState {
+    #[serde(
+        deserialize_with = "vec3_serde::deserialize",
+        serialize_with = "vec3_serde::serialize"
+    )]
     pub position: Vec3,
+    #[serde(
+        deserialize_with = "vec3_serde::deserialize",
+        serialize_with = "vec3_serde::serialize"
+    )]
     pub target: Vec3,
     #[serde(rename = "type")]
     pub camera_type: String,
@@ -92,9 +208,19 @@ pub struct CameraState {
 /// Camera move request.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CameraMoveRequest {
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "vec3_serde::deserialize_option",
+        serialize_with = "vec3_serde::serialize_option"
+    )]
     pub position: Option<Vec3>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "vec3_serde::deserialize_option",
+        serialize_with = "vec3_serde::serialize_option"
+    )]
     pub target: Option<Vec3>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub transition: Option<bool>,
@@ -186,7 +312,15 @@ pub struct SunDateRequest {
 /// Terrain bounding box.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TerrainBbox {
+    #[serde(
+        deserialize_with = "vec3_serde::deserialize",
+        serialize_with = "vec3_serde::serialize"
+    )]
     pub min: Vec3,
+    #[serde(
+        deserialize_with = "vec3_serde::deserialize",
+        serialize_with = "vec3_serde::serialize"
+    )]
     pub max: Vec3,
 }
 
@@ -223,6 +357,11 @@ pub struct ColorbarAddRequest {
 /// Extruded polygon returned by design tool.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ExtrudedPolygon {
+    #[serde(
+        rename = "coordinates",
+        deserialize_with = "vec3_serde::deserialize_vec",
+        serialize_with = "vec3_serde::serialize_vec"
+    )]
     pub points: Vec<Vec3>,
     pub height: f64,
 }
@@ -230,6 +369,11 @@ pub struct ExtrudedPolygon {
 /// Line returned by design tool.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Line {
+    #[serde(
+        rename = "coordinates",
+        deserialize_with = "vec3_serde::deserialize_vec",
+        serialize_with = "vec3_serde::serialize_vec"
+    )]
     pub points: Vec<Vec3>,
 }
 
@@ -355,6 +499,10 @@ pub struct GetTrianglesRequest {
 /// Get paths inside polygons request.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct GetPathsInsidePolygonsRequest {
+    #[serde(
+        deserialize_with = "vec3_serde::deserialize_polygons",
+        serialize_with = "vec3_serde::serialize_polygons"
+    )]
     pub polygons: Vec<Vec<Vec3>>,
 }
 
@@ -459,7 +607,12 @@ pub struct CreateFromFloorsRequest {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ProposalAddElementRequest {
     pub urn: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "vec3_serde::deserialize_option",
+        serialize_with = "vec3_serde::serialize_option"
+    )]
     pub position: Option<Vec3>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub transform: Option<Transform>,
@@ -801,5 +954,78 @@ impl MessagePortHandle {
 impl std::fmt::Debug for MessagePortHandle {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("MessagePortHandle").finish()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn camera_state_accepts_object_vec3s() {
+        let state: CameraState = serde_json::from_str(
+            r#"{
+                "position": { "x": 1.0, "y": 2.0, "z": 3.0 },
+                "target": { "x": 4.0, "y": 5.0, "z": 6.0 },
+                "type": "perspective"
+            }"#,
+        )
+        .unwrap();
+
+        assert_eq!(state.position, [1.0, 2.0, 3.0]);
+        assert_eq!(state.target, [4.0, 5.0, 6.0]);
+    }
+
+    #[test]
+    fn camera_move_request_serializes_vec3s_as_objects() {
+        let request = CameraMoveRequest {
+            position: Some([1.0, 2.0, 3.0]),
+            target: Some([4.0, 5.0, 6.0]),
+            transition: None,
+        };
+
+        let json = serde_json::to_value(request).unwrap();
+        assert_eq!(
+            json,
+            serde_json::json!({
+                "position": { "x": 1.0, "y": 2.0, "z": 3.0 },
+                "target": { "x": 4.0, "y": 5.0, "z": 6.0 }
+            })
+        );
+    }
+
+    #[test]
+    fn extruded_polygon_uses_coordinates_field() {
+        let polygon: ExtrudedPolygon = serde_json::from_str(
+            r#"{
+                "coordinates": [
+                    { "x": 1.0, "y": 2.0, "z": 3.0 },
+                    { "x": 4.0, "y": 5.0, "z": 6.0 }
+                ],
+                "height": 7.0
+            }"#,
+        )
+        .unwrap();
+
+        assert_eq!(polygon.points, vec![[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]]);
+        assert_eq!(polygon.height, 7.0);
+    }
+
+    #[test]
+    fn polygon_requests_serialize_nested_vec3s_as_objects() {
+        let request = GetPathsInsidePolygonsRequest {
+            polygons: vec![vec![[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]]],
+        };
+
+        let json = serde_json::to_value(request).unwrap();
+        assert_eq!(
+            json,
+            serde_json::json!({
+                "polygons": [[
+                    { "x": 1.0, "y": 2.0, "z": 3.0 },
+                    { "x": 4.0, "y": 5.0, "z": 6.0 }
+                ]]
+            })
+        );
     }
 }

@@ -1,0 +1,21 @@
+[package]
+name = "pick-point-extension"
+version = "0.1.0"
+edition = "2021"
+description = "Sample Autodesk Forma Site Design pick-point extension written in Rust/WASM"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+forma-embedded-view-sdk = { path = "../../crates/forma-embedded-view-sdk" }
+web-sys = { version = "0.3", features = [
+    "Document",
+    "Element",
+    "HtmlButtonElement",
+    "Node",
+    "Window",
+    "Text",
+    "Event",
+    "console",
+] }

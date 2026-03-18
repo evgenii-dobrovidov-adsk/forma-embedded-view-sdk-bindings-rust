@@ -10,6 +10,7 @@ Rust/WASM bindings for the [forma-embedded-view-sdk](https://www.npmjs.com/packa
 ├── crates/
 │   └── forma-embedded-view-sdk/   # Rust bindings crate (wasm-bindgen)
 ├── examples/
+│   ├── pick-point-extension/      # Sample point-picking extension in Rust/WASM
 │   └── sample-extension/          # Sample Forma Site Design extension in Rust/WASM
 │       ├── src/lib.rs             # Extension logic
 │       ├── web/index.html         # HTML entry point
@@ -30,6 +31,23 @@ Rust/WASM bindings for the [forma-embedded-view-sdk](https://www.npmjs.com/packa
   cargo install wasm-pack
   ```
 
+### Example extensions
+
+- `examples/sample-extension` - Color selected buildings with the Render API
+- `examples/pick-point-extension` - Trigger `designTool.getPoint()` and display the picked coordinates
+
+### Build and serve the pick-point extension
+
+```bash
+# Build the WASM binary
+cd examples/pick-point-extension
+./build.sh
+
+# Serve locally
+cd web
+python3 -m http.server 8080
+```
+
 ### Build and serve the sample extension
 
 ```bash
@@ -44,7 +62,14 @@ python3 -m http.server 8080
 
 Then configure your Forma Site Design extension's embedded view URL to `http://localhost:8080`.
 
-### What the sample extension does
+### What the examples do
+
+The pick-point extension is a focused `design_tool().get_point()` demo:
+
+1. Click **Pick point** in the embedded view
+2. Click a point in the Forma Site Design 3D scene
+3. The extension shows the picked local `x`, `y`, and `z` coordinates
+4. Press **Esc** while picking to verify the cancel flow
 
 The sample extension is a **Color Selected Buildings** tool:
 

@@ -1,6 +1,7 @@
 use crate::subscription::VoidSubscription;
 use crate::types::*;
 use crate::Result;
+use serde::Deserialize;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::JsFuture;
 
@@ -42,6 +43,14 @@ pub struct DesignToolApi {
     inner: js::DesignToolApi,
 }
 
+#[derive(Deserialize)]
+struct PickedPoint(#[serde(deserialize_with = "crate::types::vec3_serde::deserialize")] Vec3);
+
+#[derive(Deserialize)]
+struct PickedPolygon(
+    #[serde(deserialize_with = "crate::types::vec3_serde::deserialize_vec")] Vec<Vec3>,
+);
+
 impl DesignToolApi {
     pub(crate) fn from_raw(raw: js::DesignToolApi) -> Self {
         Self { inner: raw }
@@ -54,7 +63,9 @@ impl DesignToolApi {
         if result.is_undefined() || result.is_null() {
             return Ok(None);
         }
-        Ok(Some(serde_wasm_bindgen::from_value(result)?))
+        Ok(Some(
+            serde_wasm_bindgen::from_value::<PickedPoint>(result)?.0,
+        ))
     }
 
     /// Activate tool for creating a polygon.
@@ -64,7 +75,9 @@ impl DesignToolApi {
         if result.is_undefined() || result.is_null() {
             return Ok(None);
         }
-        Ok(Some(serde_wasm_bindgen::from_value(result)?))
+        Ok(Some(
+            serde_wasm_bindgen::from_value::<PickedPolygon>(result)?.0,
+        ))
     }
 
     /// Activate tool for creating an extruded polygon.
@@ -113,5 +126,30 @@ impl DesignToolApi {
         let unsubscribe_fn: ::js_sys::Function =
             ::js_sys::Reflect::get(&result, &"unsubscribe".into())?.into();
         Ok(VoidSubscription::new(closure, unsubscribe_fn))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn picked_point_accepts_object_vec3() {
+        let point: PickedPoint =
+            serde_json::from_str(r#"{ "x": 1.0, "y": 2.0, "z": 3.0 }"#).unwrap();
+        assert_eq!(point.0, [1.0, 2.0, 3.0]);
+    }
+
+    #[test]
+    fn picked_polygon_accepts_object_vec3s() {
+        let polygon: PickedPolygon = serde_json::from_str(
+            r#"[
+                { "x": 1.0, "y": 2.0, "z": 3.0 },
+                { "x": 4.0, "y": 5.0, "z": 6.0 }
+            ]"#,
+        )
+        .unwrap();
+
+        assert_eq!(polygon.0, vec![[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]]);
     }
 }

@@ -2,5 +2,6 @@
 resolver = "2"
 members = [
     "crates/forma-embedded-view-sdk",
+    "examples/pick-point-extension",
     "examples/sample-extension",
 ]
